@@ -6,6 +6,7 @@ import '../../app/theme/app_colors.dart';
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
+  @override
   Widget build(BuildContext context) {
     final settings = AppSettingsScope.of(context);
     final accentColor = settings.accentColor;
@@ -33,7 +34,7 @@ class SettingsScreen extends StatelessWidget {
                   for (var i = 0; i < themeOptions.length; i++) ...[
                     _ColorDot(
                       color: themeOptions[i],
-                      selected: themeOptions[i].value == accentColor.value,
+                      selected: themeOptions[i] == accentColor,
                       onTap: () => settings.setAccentColor(themeOptions[i]),
                     ),
                     if (i != themeOptions.length - 1)

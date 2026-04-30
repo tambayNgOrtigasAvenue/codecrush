@@ -47,7 +47,6 @@ class _RunPlayScreenState extends State<RunPlayScreen> {
   bool _running = false;
   int _correct = 0;
   int _incorrect = 0;
-  int _targetIndex = 0;
   String _currentTarget = '';
 
   @override
@@ -66,7 +65,6 @@ class _RunPlayScreenState extends State<RunPlayScreen> {
 
   void _pickTarget() {
     _currentTarget = _targets[_random.nextInt(_targets.length)];
-    _targetIndex += 1;
   }
 
   void _startTimer() {
@@ -140,7 +138,6 @@ class _RunPlayScreenState extends State<RunPlayScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final accentColor = Theme.of(context).colorScheme.primary;
     final settings = AppSettingsScope.of(context);
     final player = _characters[settings.characterIndex % _characters.length];
     final opponent = _characters[1];
@@ -247,7 +244,7 @@ class _RunPlayScreenState extends State<RunPlayScreen> {
   String _formatTime(int seconds) {
     final minutes = seconds ~/ 60;
     final remainder = seconds % 60;
-    return '${minutes}:${remainder.toString().padLeft(2, '0')}';
+    return '$minutes:${remainder.toString().padLeft(2, '0')}';
   }
 }
 
