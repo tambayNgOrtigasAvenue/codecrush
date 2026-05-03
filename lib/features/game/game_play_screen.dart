@@ -121,6 +121,7 @@ class _GamePlayScreenState extends State<GamePlayScreen> {
         });
         _focusNode.unfocus();
         _saveHistory();
+        _showGameOverDialog();
         return;
       }
       setState(() {
@@ -188,6 +189,115 @@ class _GamePlayScreenState extends State<GamePlayScreen> {
         ),
       );
     }
+  }
+
+  void _showGameOverDialog() {
+    final speed = _calculateWpm();
+    final accuracy = _calculateAccuracy();
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: AppColors.darkSurface,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.emoji_events,
+                    size: 48,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Time\'s Up!',
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        color: AppColors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _GameOverStatBox(label: 'Speed', value: '$speed WPM'),
+                    _GameOverStatBox(label: 'Accuracy', value: '$accuracy%'),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _GameOverStatBox(label: 'Correct', value: '$_correct', color: AppColors.green),
+                    _GameOverStatBox(label: 'Incorrect', value: '$_incorrect', color: AppColors.pink),
+                  ],
+                ),
+                const SizedBox(height: 32),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                        },
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: const BorderSide(color: AppColors.white50),
+                          ),
+                        ),
+                        child: Text(
+                          'BACK',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: AppColors.white,
+                              ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          _resetGame();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).colorScheme.primary,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          'PLAY AGAIN',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: AppColors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   int _calculateAccuracy() {
@@ -435,6 +545,41 @@ class _SentencePreview extends StatelessWidget {
                   : AppColors.white50,
             ),
           ),
+      ],
+    );
+  }
+}
+
+class _GameOverStatBox extends StatelessWidget {
+  const _GameOverStatBox({
+    required this.label,
+    required this.value,
+    this.color = AppColors.white,
+  });
+
+  final String label;
+  final String value;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppColors.white50,
+              ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                color: color,
+                fontWeight: FontWeight.bold,
+              ),
+        ),
       ],
     );
   }
