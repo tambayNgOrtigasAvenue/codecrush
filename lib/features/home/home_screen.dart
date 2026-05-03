@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../app/theme/app_colors.dart';
+import '../game/binary_setup_screen.dart';
 import '../game/game_setup_screen.dart';
 import '../game/run_setup_screen.dart';
 import '../history/history_screen.dart';
@@ -47,7 +48,17 @@ class HomeScreen extends StatelessWidget {
                       },
                     ),
                     const _ModeTile(title: 'SEN', label: 'Sentence'),
-                    const _ModeTile(title: '010', label: 'Binary'),
+                    _ModeTile(
+                      title: '010',
+                      label: 'Binary',
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const BinarySetupScreen(),
+                          ),
+                        );
+                      },
+                    ),
                     _ModeTile(
                       icon: Icons.directions_run,
                       label: 'Run',
