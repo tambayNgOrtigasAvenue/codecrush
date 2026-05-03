@@ -1,15 +1,38 @@
 import 'package:flutter/material.dart';
 
 import '../../app/theme/app_colors.dart';
+import '../../app/database/course.dart';
+import '../../app/database/database_helper.dart';
 import '../history/history_screen.dart';
 import '../home/home_screen.dart';
 import '../settings/settings_screen.dart';
-import 'course_data.dart';
 import 'course_overview_screen.dart';
 import 'courses_screen.dart';
 
-class LessonsScreen extends StatelessWidget {
+class LessonsScreen extends StatefulWidget {
   const LessonsScreen({super.key});
+
+  @override
+  State<LessonsScreen> createState() => _LessonsScreenState();
+}
+
+class _LessonsScreenState extends State<LessonsScreen> {
+  List<Course> _courses = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCourses();
+  }
+
+  Future<void> _loadCourses() async {
+    final courses = await DatabaseHelper.instance.getAllCourses();
+    setState(() {
+      _courses = courses;
+      _isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,75 +51,77 @@ class LessonsScreen extends StatelessWidget {
               },
             ),
             Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 16,
-                ),
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _SearchField(
-                          hintText: 'Search Course',
-                          onTap: () {},
-                        ),
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 16,
                       ),
-                      const SizedBox(width: 8),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => const CoursesScreen(),
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _SearchField(
+                                hintText: 'Search Course',
+                                onTap: () {},
+                              ),
                             ),
-                          );
-                        },
-                        child: Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: accentColor,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Icon(Icons.tune, color: AppColors.white),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Full Stack Web Developer',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                  const SizedBox(height: 12),
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                          childAspectRatio: 152 / 204,
-                        ),
-                    itemCount: sampleCourses.length,
-                    itemBuilder: (context, index) {
-                      final course = sampleCourses[index];
-                      return _CourseCard(
-                        course: course,
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  CourseOverviewScreen(course: course),
+                            const SizedBox(width: 8),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (_) => const CoursesScreen(),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: accentColor,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: const Icon(Icons.tune, color: AppColors.white),
+                              ),
                             ),
-                          );
-                        },
-                      );
-                    },
-                  ),
-                ],
-              ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Full Stack Web Developer',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                        const SizedBox(height: 12),
+                        GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 12,
+                                mainAxisSpacing: 12,
+                                childAspectRatio: 152 / 204,
+                              ),
+                          itemCount: _courses.length,
+                          itemBuilder: (context, index) {
+                            final course = _courses[index];
+                            return _CourseCard(
+                              course: course,
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (_) =>
+                                        CourseOverviewScreen(course: course),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ],
+                    ),
             ),
             _BottomNav(
               onPlayTap: () {
@@ -186,7 +211,7 @@ class _SearchField extends StatelessWidget {
 class _CourseCard extends StatelessWidget {
   const _CourseCard({required this.course, required this.onTap});
 
-  final CourseSummary course;
+  final Course course;
   final VoidCallback onTap;
 
   @override

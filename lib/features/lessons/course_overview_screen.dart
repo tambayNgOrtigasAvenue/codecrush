@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../../app/theme/app_colors.dart';
-import 'course_data.dart';
+import '../../app/database/course.dart';
+import 'course_content_screen.dart';
 
 class CourseOverviewScreen extends StatelessWidget {
   const CourseOverviewScreen({super.key, required this.course});
 
-  final CourseSummary course;
+  final Course course;
 
   @override
   Widget build(BuildContext context) {
@@ -127,18 +128,28 @@ class CourseOverviewScreen extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Container(
-                    height: 52,
-                    decoration: BoxDecoration(
-                      color: accentColor,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Start Course',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.white,
-                          fontWeight: FontWeight.w700,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => CourseContentScreen(course: course),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      height: 52,
+                      decoration: BoxDecoration(
+                        color: accentColor,
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Start Course',
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color: AppColors.white,
+                                fontWeight: FontWeight.w700,
+                              ),
                         ),
                       ),
                     ),

@@ -1,11 +1,34 @@
 import 'package:flutter/material.dart';
 
 import '../../app/theme/app_colors.dart';
-import 'course_data.dart';
+import '../../app/database/course.dart';
+import '../../app/database/database_helper.dart';
 import 'course_overview_screen.dart';
 
-class CoursesScreen extends StatelessWidget {
+class CoursesScreen extends StatefulWidget {
   const CoursesScreen({super.key});
+
+  @override
+  State<CoursesScreen> createState() => _CoursesScreenState();
+}
+
+class _CoursesScreenState extends State<CoursesScreen> {
+  List<Course> _courses = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCourses();
+  }
+
+  Future<void> _loadCourses() async {
+    final courses = await DatabaseHelper.instance.getAllCourses();
+    setState(() {
+      _courses = courses;
+      _isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,24 +64,27 @@ class CoursesScreen extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                itemBuilder: (context, index) {
-                  final course = sampleCourses[index];
-                  return _CourseListItem(
-                    course: course,
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => CourseOverviewScreen(course: course),
-                        ),
-                      );
-                    },
-                  );
-                },
-                separatorBuilder: (_, _) => const SizedBox(height: 12),
-                itemCount: sampleCourses.length,
-              ),
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.separated(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      itemBuilder: (context, index) {
+                        final course = _courses[index];
+                        return _CourseListItem(
+                          course: course,
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    CourseOverviewScreen(course: course),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      separatorBuilder: (_, _) => const SizedBox(height: 12),
+                      itemCount: _courses.length,
+                    ),
             ),
           ],
         ),
@@ -133,7 +159,7 @@ class _SearchField extends StatelessWidget {
 class _CourseListItem extends StatelessWidget {
   const _CourseListItem({required this.course, required this.onTap});
 
-  final CourseSummary course;
+  final Course course;
   final VoidCallback onTap;
 
   @override
