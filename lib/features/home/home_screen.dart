@@ -48,7 +48,6 @@ class HomeScreen extends StatelessWidget {
                     ),
                     const _ModeTile(title: 'SEN', label: 'Sentence'),
                     const _ModeTile(title: '010', label: 'Binary'),
-                    const _ModeTile(title: '010', label: 'Binary'),
                     _ModeTile(
                       icon: Icons.directions_run,
                       label: 'Run',
