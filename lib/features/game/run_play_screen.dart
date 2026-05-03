@@ -285,7 +285,9 @@ class _RunPlayScreenState extends State<RunPlayScreen> {
                       if (!_running) {
                         _startTimer();
                       }
-                      if (value.endsWith(' ')) {
+                      if (value.trim() == _currentTarget) {
+                        _submitWord(value);
+                      } else if (value.endsWith(' ')) {
                         _submitWord(value);
                       }
                     },

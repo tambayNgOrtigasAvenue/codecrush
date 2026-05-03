@@ -263,7 +263,10 @@ class _GamePlayScreenState extends State<GamePlayScreen> {
                             if (!_running) {
                               _startTimer();
                             }
-                            if (value.endsWith(' ')) {
+                            final expected = _words[_currentWordIndex];
+                            if (value.trim() == expected) {
+                              _submitWord(value);
+                            } else if (value.endsWith(' ')) {
                               _submitWord(value);
                             }
                           },
