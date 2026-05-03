@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.codecrush"
+    namespace = "com.codecrush.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -20,10 +20,7 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.codecrush"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
+        applicationId = "com.codecrush.app"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -32,9 +29,28 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
+            // TODO: Replace with a proper signing config before publishing to Play Store.
             signingConfig = signingConfigs.getByName("debug")
+        }
+    }
+
+    // ── Rename APK output to: codecrush-{versionName}-android.apk ──────────
+    applicationVariants.all {
+        val variant = this
+        val versionName = variant.versionName ?: "1.0.0"
+        val buildType   = variant.buildType.name          // "release" or "debug"
+        val apkName     = "codecrush-${versionName}-android.apk"
+
+        tasks.named("assemble${variant.name.replaceFirstChar { it.uppercase() }}") {
+            doLast {
+                val outputDir = file("${buildDir}/outputs/flutter-apk")
+                val source    = File(outputDir, "app-${buildType}.apk")
+                val target    = File(outputDir, apkName)
+                if (source.exists()) {
+                    source.copyTo(target, overwrite = true)
+                    println("APK copied → ${target.name}")
+                }
+            }
         }
     }
 }

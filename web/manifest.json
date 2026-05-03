@@ -1,6 +1,6 @@
 {
-    "name": "codecrush",
-    "short_name": "codecrush",
+    "name": "CodeCrush",
+    "short_name": "CodeCrush",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

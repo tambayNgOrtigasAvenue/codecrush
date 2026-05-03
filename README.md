@@ -1,3 +1,3 @@
-# codecrush
+# CodeCrush
 
-A new Flutter project.
+CodeCrush - A mobile coding and typing game.
