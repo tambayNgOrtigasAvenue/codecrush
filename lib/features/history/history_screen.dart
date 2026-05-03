@@ -1,15 +1,47 @@
 import 'package:flutter/material.dart';
 
+import '../../app/database/database_helper.dart';
+import '../../app/database/player_progress.dart';
 import '../../app/theme/app_colors.dart';
 import '../home/home_screen.dart';
 import '../lessons/lessons_screen.dart';
 import '../settings/settings_screen.dart';
 
-class HistoryScreen extends StatelessWidget {
+class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
 
   @override
+  State<HistoryScreen> createState() => _HistoryScreenState();
+}
+
+class _HistoryScreenState extends State<HistoryScreen> {
+  List<PlayerProgress> _progressList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadHistory();
+  }
+
+  Future<void> _loadHistory() async {
+    final progress = await DatabaseHelper.instance.getAllProgress();
+    setState(() {
+      _progressList = progress;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final hasClassic = _progressList.any((p) => p.lessonId == 'classic_mode');
+    final hasRun = _progressList.any((p) => p.lessonId == 'run_mode');
+
+    final classicScore = hasClassic
+        ? _progressList.firstWhere((p) => p.lessonId == 'classic_mode').score
+        : 0;
+    final runScore = hasRun
+        ? _progressList.firstWhere((p) => p.lessonId == 'run_mode').score
+        : 0;
+
     return Scaffold(
       backgroundColor: AppColors.darkBackground,
       body: SafeArea(
@@ -28,12 +60,16 @@ class HistoryScreen extends StatelessWidget {
                   horizontal: 24,
                   vertical: 16,
                 ),
-                children: const [
-                  _SectionTitle(title: 'High Scores'),
-                  _EmptyState(),
-                  SizedBox(height: 20),
-                  _SectionTitle(title: 'Recent'),
-                  _EmptyState(),
+                children: [
+                  const _SectionTitle(title: 'High Scores'),
+                  if (_progressList.isEmpty)
+                    const _EmptyState()
+                  else ...[
+                    if (hasClassic)
+                      _ScoreCard(title: 'Word Mode', score: classicScore, icon: Icons.text_fields),
+                    if (hasRun)
+                      _ScoreCard(title: 'Run Mode', score: runScore, icon: Icons.directions_run),
+                  ],
                 ],
               ),
             ),
@@ -167,6 +203,70 @@ class _BottomNav extends StatelessWidget {
           IconButton(
             onPressed: onPlayTap,
             icon: const Icon(Icons.play_arrow, color: AppColors.white50),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ScoreCard extends StatelessWidget {
+  const _ScoreCard({
+    required this.title,
+    required this.score,
+    required this.icon,
+  });
+
+  final String title;
+  final int score;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(top: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.darkSurface,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              icon,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'High Score',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: AppColors.white50,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Text(
+            '$score WPM',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              color: AppColors.white,
+            ),
           ),
         ],
       ),

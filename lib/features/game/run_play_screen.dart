@@ -3,6 +3,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../../app/database/database_helper.dart';
+import '../../app/database/player_progress.dart';
 import '../../app/settings/app_settings.dart';
 import '../../app/theme/app_colors.dart';
 
@@ -122,6 +124,7 @@ class _RunPlayScreenState extends State<RunPlayScreen> {
           _secondsLeft = 0;
         });
         _focusNode.unfocus();
+        _saveHistory();
         return;
       }
       setState(() {
@@ -166,6 +169,23 @@ class _RunPlayScreenState extends State<RunPlayScreen> {
     }
     final minutes = elapsed / 60;
     return (_correct / minutes).floor();
+  }
+
+  Future<void> _saveHistory() async {
+    final speed = _calculateWpm();
+    if (speed == 0) return;
+
+    final existing = await DatabaseHelper.instance.getProgress('run_mode');
+    if (existing == null || speed > existing.score) {
+      await DatabaseHelper.instance.insertOrUpdateProgress(
+        PlayerProgress(
+          lessonId: 'run_mode',
+          score: speed,
+          isCompleted: true,
+          updatedAt: DateTime.now(),
+        ),
+      );
+    }
   }
 
   int _calculateAccuracy() {
